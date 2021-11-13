@@ -1,0 +1,53 @@
+[ {
+    "defaultTest": {
+	"doc" : "these two tests will be executed against all requests, in this example checking http code is 200 or 204 and that there is data on the response",
+        "httpCode": [200, 204],
+        "validateData": {}
+    },
+
+    "tests":{
+
+	"doc": "These are sample tests, for each key we define some different runs on an array",
+        "echo test": [
+          {
+	    "description":"Test echo endpoint with one param",
+            "queryParams": {
+	      "foo": "bar"
+	    },
+            "httpCode": 200,
+            "validateData": {
+              "args.foo": "bar"
+            }
+          },
+          {
+	    "description":"Test echo endpoint with two params",
+            "queryParams": {
+	      "foo": "bar",
+	      "day": "night"
+	    },
+            "httpCode": 200,
+            "validateData": {
+              "args.foo": "bar",
+	      "args.day": "night"
+            }
+          }
+        ],
+        "path test": [
+          {
+	    "description":"Test echo endpoint with one param and one path param",
+	    "pathParams": {
+	       "operation": "get"
+	    },
+            "queryParams": {
+	      "foo": "bar"
+	    },
+            "httpCode": 200,
+            "validateData": {
+              "args.foo": "bar"
+            }
+          }
+        ]
+  }
+  }]
+
+

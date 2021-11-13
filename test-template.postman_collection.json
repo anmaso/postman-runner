@@ -1,0 +1,271 @@
+{
+	"info": {
+		"_postman_id": "f2ce0aba-22e2-42f0-be17-07c5c30e26cd",
+		"name": "test-template",
+		"description": "API that manages MEDIRCDPS. The v1 includes the functionality of the Simulator and the Calculator.\n\nContact Support:\n Name: Mercadona S.A.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "echo test",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/get?foo1=bar1&foo2=bar2",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"get"
+					],
+					"query": [
+						{
+							"key": "foo1",
+							"value": "bar1"
+						},
+						{
+							"key": "foo2",
+							"value": "bar2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "path test",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://postman-echo.com/:operation",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						":operation"
+					],
+					"variable": [
+						{
+							"key": "operation",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "tokenName",
+				"value": "token",
+				"type": "string"
+			},
+			{
+				"key": "clientSecret",
+				"value": "{{API_CLIENT_SECRET}}",
+				"type": "string"
+			},
+			{
+				"key": "clientId",
+				"value": "{{API_CLIENT_ID}}",
+				"type": "string"
+			},
+			{
+				"key": "accessTokenUrl",
+				"value": "https://ADFS_SERVER/adfs/oauth2/token/",
+				"type": "string"
+			},
+			{
+				"key": "scope",
+				"value": "read write",
+				"type": "string"
+			},
+			{
+				"key": "grant_type",
+				"value": "client_credentials",
+				"type": "string"
+			},
+			{
+				"key": "redirect_uri",
+				"value": "https://tornillo.dev.srv.mercadona.com/dppnuevo/callback",
+				"type": "string"
+			},
+			{
+				"key": "authUrl",
+				"value": "https://fed.itgmercadona.com/adfs/oauth2/authorize",
+				"type": "string"
+			},
+			{
+				"key": "useBrowser",
+				"value": false,
+				"type": "boolean"
+			},
+			{
+				"key": "challengeAlgorithm",
+				"value": "S256",
+				"type": "string"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			},
+			{
+				"key": "client_authentication",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"",
+					"var prepareTests = function helper(TESTS) {",
+					"    let allTests = pm.collectionVariables.get(\"allTests\") || [];",
+					"    if (!allTests || allTests.length == 0) {",
+					"        allTests = [...TESTS]",
+					"",
+					"    }",
+					"    let test = allTests.shift();",
+					"    pm.collectionVariables.set(\"allTests\", allTests);",
+					"    pm.collectionVariables.set(\"test\", test);",
+					"    ",
+					"",
+					"    // resolver path variables en la request",
+					"    if (test.pathVariables && Object.entries(test.pathVariables).length > 0) {",
+					"        Object.entries(test.pathVariables).forEach(([path, value]) => {",
+					"            var index = pm.request.url.path.indexOf(path);",
+					"            if (index != -1)",
+					"                pm.request.url.path[parseInt(index)] = value;",
+					"        })",
+					"    }",
+					"",
+					"    if (test.queryParams && Object.entries(test.queryParams).length > 0) {",
+					"        pm.request.url.query.clear();",
+					"        Object.entries(test.queryParams).forEach(([key, value]) => {",
+					"            pm.request.url.query.add(key + '=' + value);",
+					"        })",
+					"    }",
+					"};",
+					"",
+					"",
+					"// obtenemos los datos de test del iterationData, que estarán todos en el elemento 0, y los almacenamos en variables globales",
+					"var allData = {};",
+					"if (pm.iterationData) {",
+					"    allData = pm.iterationData.get(\"tests\") || {};",
+					"    defaultTest = pm.iterationData.get(\"defaultTest\") || {};",
+					"}",
+					"pm.collectionVariables.set(\"allData\", allData);",
+					"pm.collectionVariables.set(\"defaultTest\", defaultTest);",
+					"var testData = allData[request.name];",
+					"if (testData) {",
+					"    prepareTests(testData);",
+					"}",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// configure this for your response data format",
+					"const DATA_FIELD=\"data\";",
+					"",
+					"const getData = (jsonData)=>{",
+					"    return jsonData? jsonData[DATA_FIELD] : undefined;",
+					"}",
+					"",
+					"",
+					"const allTests = pm.collectionVariables.get(\"allTests\");",
+					"const defaultTest = pm.collectionVariables.get(\"defaultTest\");",
+					"",
+					"const test = pm.collectionVariables.get(\"test\") || defaultTest;",
+					"",
+					"function getValueByPath(obj, path) {",
+					"    path = (\"\" + path).split('.');",
+					"    var result = obj,",
+					"        i;",
+					"    for (i = 0; i < path.length; i++) {",
+					"        try {",
+					"            result = result[path[i]];",
+					"        }",
+					"        catch (e) {",
+					"            return undefined;",
+					"        }",
+					"    }",
+					"    return result",
+					"}",
+					"",
+					"var jsonData;",
+					"try {",
+					"    jsonData = pm.response.json();",
+					"} catch (e) { }",
+					"",
+					"//solo hacemos tests automaticos si tenemos algo definido en test∫",
+					"if (test.httpCode) {",
+					"    pm.test(\"http response code:  \" + test.httpCode, function () {",
+					"        pm.expect(pm.response.code).to.be.oneOf([].concat(test.httpCode));",
+					"    });",
+					"    if (test.validateData) {",
+					"",
+					"        Object.entries(test.validateData).forEach(([path, value]) => {",
+					"            pm.test(path + \" is \" + value, function () {",
+					"                if((\"\"+value).startsWith(\"/\")){",
+					"                    value=value.substr(1, value.length)",
+					"                    value=new RegExp(value)",
+					"                    pm.expect(getValueByPath(getData(jsonData), path)).to.match(new RegExp(value))",
+					"                }else{",
+					"                    pm.expect(getValueByPath(getData(jsonData), path)).to.eqls(value)",
+					"                }",
+					"                ",
+					"                ",
+					"            })",
+					"        })",
+					"    }",
+					"    pm.test(\"Expect data on response ? :\" + (!!test.validateData), function () {",
+					"        if (test.validateData) {",
+					"            pm.expect(getData(jsonData)).to.be.of.an(\"object\")",
+					"        } else {",
+					"            pm.expect(getData(jsonData)).to.be.undefined;",
+					"        }",
+					"    });",
+					"}",
+					"",
+					"// iterate to the same test",
+					"if (allTests && allTests.length > 0) {",
+					"    postman.setNextRequest(request.name);",
+					"}",
+					"// delete \"test\" variable if all tests done",
+					"if (allTests && allTests.length == 0) {",
+					"    pm.collectionVariables.set(\"test\", null);",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "allData",
+			"value": ""
+		},
+		{
+			"key": "defaultTest",
+			"value": ""
+		}
+	]
+}
